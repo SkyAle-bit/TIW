@@ -1,16 +1,19 @@
 package com.example.helpdesk.service;
 
+import com.example.helpdesk.dto.RatingUpdateRequest;
 import com.example.helpdesk.dto.TicketCreateRequest;
 import com.example.helpdesk.dto.TicketResponse;
 import com.example.helpdesk.model.Ticket;
 import com.example.helpdesk.model.User;
 import com.example.helpdesk.model.enums.TicketPriority;
+import com.example.helpdesk.model.enums.TicketRating;
 import com.example.helpdesk.model.enums.TicketStatus;
 import com.example.helpdesk.repository.TicketRepository;
 import com.example.helpdesk.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ public class TicketService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    @Transactional
     public TicketResponse createTicket(TicketCreateRequest request) {
         User currentUser = getCurrentUser();
 
@@ -38,6 +42,10 @@ public class TicketService {
         ticket.setPriority(TicketPriority.MEDIUM); // Default priority come da richiesta
         ticket.setStatus(TicketStatus.OPEN); // Default status
         ticket.setCreatedBy(currentUser);
+
+        // Assegnazione Automatica
+        userRepository.findOperatorWithLeastOpenOrInProgressTickets()
+                .ifPresent(ticket::setAssignedTo);
 
         Ticket savedTicket = ticketRepository.save(ticket);
         return mapToResponse(savedTicket);
@@ -61,6 +69,27 @@ public class TicketService {
         }
 
         return mapToResponse(ticket);
+    }
+
+    @Transactional
+    public TicketResponse updateTicketRating(Long id, RatingUpdateRequest request) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        User currentUser = getCurrentUser();
+
+        if (!ticket.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Access Denied: Ticket does not belong to the current user");
+        }
+
+        if (ticket.getStatus() != TicketStatus.RESOLVED) {
+            throw new RuntimeException("Cannot rate a ticket that is not in RESOLVED status");
+        }
+
+        ticket.setRating(request.getRating());
+        Ticket savedTicket = ticketRepository.save(ticket);
+
+        return mapToResponse(savedTicket);
     }
 
     private TicketResponse mapToResponse(Ticket ticket) {
