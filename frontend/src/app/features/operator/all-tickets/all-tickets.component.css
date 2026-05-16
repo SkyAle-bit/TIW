@@ -1,0 +1,27 @@
+.list-container {
+  padding: 20px;
+}
+
+.filters {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+table {
+  width: 100%;
+}
+
+.dense-field {
+  width: 140px;
+  margin: 5px 0;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: gray;
+}

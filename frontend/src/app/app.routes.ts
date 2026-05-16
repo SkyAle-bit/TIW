@@ -25,5 +25,17 @@ export const routes: Routes = [
     path: 'tickets/:id',
     loadComponent: () => import('./features/tickets/ticket-detail/ticket-detail.component').then(m => m.TicketDetailComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'operator/dashboard',
+    loadComponent: () => import('./features/operator/operator-dashboard/operator-dashboard.component').then(m => m.OperatorDashboardComponent),
+    canActivate: [authGuard],
+    data: { roles: ['OPERATOR'] }
+  },
+  {
+    path: 'operator/tickets',
+    loadComponent: () => import('./features/operator/all-tickets/all-tickets.component').then(m => m.AllTicketsComponent),
+    canActivate: [authGuard],
+    data: { roles: ['OPERATOR'] }
   }
 ];

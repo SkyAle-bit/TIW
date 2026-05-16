@@ -1,0 +1,27 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.cards-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.stat-card {
+  width: 200px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #3f51b5; /* Primary color */
+  margin-top: 10px;
+}
+
+.loading {
+  color: gray;
+  font-style: italic;
+}
