@@ -1,0 +1,84 @@
+<div class="detail-container" *ngIf="ticket">
+  <div class="header-actions">
+    <button mat-button routerLink="/tickets">
+      <mat-icon>arrow_back</mat-icon> Back to Tickets
+    </button>
+  </div>
+
+  <mat-card class="ticket-card">
+    <mat-card-header>
+      <mat-card-title>#{{ ticket.id }} - {{ ticket.title }}</mat-card-title>
+      <mat-card-subtitle>
+        Created by {{ ticket.createdBy }} on {{ ticket.createdAt | date:'medium' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="meta-data">
+        <mat-chip-set>
+          <mat-chip>Status: {{ ticket.status }}</mat-chip>
+          <mat-chip>Priority: {{ ticket.priority }}</mat-chip>
+          <mat-chip>Category: {{ ticket.category }}</mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="description-box">
+        <h3>Description</h3>
+        <p>{{ ticket.description }}</p>
+      </div>
+
+      <!-- User Rating Section (Only shown if RESOLVED) -->
+      <div class="rating-section" *ngIf="ticket.status === 'RESOLVED'">
+        <mat-divider></mat-divider>
+        <h3>Rate your experience</h3>
+        <form [formGroup]="ratingForm" (ngSubmit)="onUpdateRating()" class="rating-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Rating</mat-label>
+            <mat-select formControlName="rating">
+              <mat-option value="SATISFIED">Satisfied</mat-option>
+              <mat-option value="NOT_SATISFIED">Not Satisfied</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="accent" type="submit" [disabled]="ratingForm.invalid">Submit Rating</button>
+        </form>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="comments-card">
+    <mat-card-header>
+      <mat-card-title>Comments</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="comments-list" *ngIf="comments.length > 0">
+        <div class="comment-item" *ngFor="let comment of comments">
+          <div class="comment-header">
+            <strong>{{ comment.author }}</strong> - <span>{{ comment.createdAt | date:'short' }}</span>
+          </div>
+          <div class="comment-body">
+            {{ comment.text }}
+          </div>
+          <mat-divider></mat-divider>
+        </div>
+      </div>
+      <div *ngIf="comments.length === 0" class="no-comments">
+        <p>No new comments yet.</p>
+      </div>
+
+      <form [formGroup]="commentForm" (ngSubmit)="onAddComment()" class="add-comment-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Add a comment</mat-label>
+          <textarea matInput formControlName="text" rows="3"></textarea>
+        </mat-form-field>
+        <div class="actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="commentForm.invalid">Post Comment</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div *ngIf="!ticket" class="loading">
+  <p>Loading ticket details...</p>
+</div>
